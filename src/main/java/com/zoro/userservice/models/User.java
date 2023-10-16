@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 public class User extends BaseModel{
     private String email;
-    private String encPassword;
+    private String Password;
     @OneToMany(mappedBy = "user")
     @Fetch(FetchMode.SUBSELECT)
     private List<Session> sessions;

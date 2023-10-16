@@ -1,6 +1,6 @@
 package com.zoro.userservice.services;
 
-import com.zoro.userservice.dtos.LoginDto;
+import com.zoro.userservice.dtos.LoginRequestDto;
 import com.zoro.userservice.dtos.TokenDto;
 import com.zoro.userservice.dtos.SignUpRequestDto;
 import com.zoro.userservice.dtos.UserDto;
@@ -10,21 +10,25 @@ import com.zoro.userservice.models.User;
 import com.zoro.userservice.repositories.SessionRepository;
 import com.zoro.userservice.repositories.UserRepository;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 import java.util.Random;
 
 @Primary
 @Service
 public class AuthServiceImpl implements AuthService {
 
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
     private UserRepository userRepository;
     private SessionRepository sessionRepository;
     private String candidateChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*abcdefghijklmnopqrstuvwxyz";
-    public AuthServiceImpl(UserRepository userRepository, SessionRepository sessionRepository){
+    public AuthServiceImpl(UserRepository userRepository, SessionRepository sessionRepository, BCryptPasswordEncoder bCryptPasswordEncoder){
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
     private String getRandomToken(){
         Random random = new Random();
@@ -39,18 +43,19 @@ public class AuthServiceImpl implements AuthService {
     public UserDto signup(SignUpRequestDto signUpRequestDto) {
         User user = new User();
         user.setEmail(signUpRequestDto.getEmail());
-        user.setEncPassword(signUpRequestDto.getPassword());
+        user.setPassword(bCryptPasswordEncoder.encode(signUpRequestDto.getPassword()));
         User savedUser = userRepository.save(user);
         UserDto userDto = new UserDto();
         userDto.setEmail(savedUser.getEmail());
         return userDto;
     }
-    public TokenDto login(LoginDto loginDetails) throws NotFoundException {
+    public TokenDto login(LoginRequestDto loginDetails) throws NotFoundException {
         User user = userRepository.findByEmail(loginDetails.getEmail());
         if (user == null){
             throw new NotFoundException("User not found");
         }
-        if(!Objects.equals(user.getEncPassword(), loginDetails.getPassword())){
+        if(!bCryptPasswordEncoder.matches(loginDetails.getPassword(),user.getPassword())){
+            //TODO: Create a proper exception to throw here
             throw new NotFoundException("Incorrect password");
         }
         TokenDto tokenDto = new TokenDto();

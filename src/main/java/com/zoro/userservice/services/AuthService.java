@@ -1,15 +1,15 @@
 package com.zoro.userservice.services;
 
-import com.zoro.userservice.dtos.LoginDto;
+import com.zoro.userservice.dtos.LoginRequestDto;
 import com.zoro.userservice.dtos.TokenDto;
 import com.zoro.userservice.dtos.SignUpRequestDto;
 import com.zoro.userservice.dtos.UserDto;
 import com.zoro.userservice.exceptions.NotFoundException;
-import com.zoro.userservice.models.User;
+import org.springframework.http.ResponseEntity;
 
 public interface AuthService {
 
     UserDto signup(SignUpRequestDto signUpRequestDto);
-    TokenDto login(LoginDto loginDto) throws NotFoundException;
+    TokenDto login(LoginRequestDto loginDto) throws NotFoundException;
     String logout(TokenDto tokenDto);
 }
