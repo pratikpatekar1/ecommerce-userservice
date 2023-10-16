@@ -2,14 +2,14 @@ package com.zoro.userservice.services;
 
 import com.zoro.userservice.dtos.LoginDto;
 import com.zoro.userservice.dtos.TokenDto;
-import com.zoro.userservice.dtos.UserRegistrationDto;
+import com.zoro.userservice.dtos.SignUpRequestDto;
+import com.zoro.userservice.dtos.UserDto;
 import com.zoro.userservice.exceptions.NotFoundException;
 import com.zoro.userservice.models.User;
-import com.zoro.userservice.repositories.UserRepository;
 
-public interface UserService {
+public interface AuthService {
 
-    User createUser(UserRegistrationDto userRegistrationDto);
+    UserDto signup(SignUpRequestDto signUpRequestDto);
     TokenDto login(LoginDto loginDto) throws NotFoundException;
     String logout(TokenDto tokenDto);
 }

@@ -2,7 +2,8 @@ package com.zoro.userservice.services;
 
 import com.zoro.userservice.dtos.LoginDto;
 import com.zoro.userservice.dtos.TokenDto;
-import com.zoro.userservice.dtos.UserRegistrationDto;
+import com.zoro.userservice.dtos.SignUpRequestDto;
+import com.zoro.userservice.dtos.UserDto;
 import com.zoro.userservice.exceptions.NotFoundException;
 import com.zoro.userservice.models.Session;
 import com.zoro.userservice.models.User;
@@ -16,12 +17,12 @@ import java.util.Random;
 
 @Primary
 @Service
-public class UserServiceImpl implements UserService{
+public class AuthServiceImpl implements AuthService {
 
     private UserRepository userRepository;
     private SessionRepository sessionRepository;
     private String candidateChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*abcdefghijklmnopqrstuvwxyz";
-    public UserServiceImpl(UserRepository userRepository, SessionRepository sessionRepository){
+    public AuthServiceImpl(UserRepository userRepository, SessionRepository sessionRepository){
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
     }
@@ -35,12 +36,14 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User createUser(UserRegistrationDto userRegistrationDto) {
+    public UserDto signup(SignUpRequestDto signUpRequestDto) {
         User user = new User();
-        user.setEmail(userRegistrationDto.getEmail());
-        user.setEncPassword(userRegistrationDto.getPassword());
+        user.setEmail(signUpRequestDto.getEmail());
+        user.setEncPassword(signUpRequestDto.getPassword());
         User savedUser = userRepository.save(user);
-        return savedUser;
+        UserDto userDto = new UserDto();
+        userDto.setEmail(savedUser.getEmail());
+        return userDto;
     }
     public TokenDto login(LoginDto loginDetails) throws NotFoundException {
         User user = userRepository.findByEmail(loginDetails.getEmail());

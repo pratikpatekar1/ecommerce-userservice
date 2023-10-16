@@ -2,10 +2,11 @@ package com.zoro.userservice.controllers;
 
 import com.zoro.userservice.dtos.LoginDto;
 import com.zoro.userservice.dtos.TokenDto;
-import com.zoro.userservice.dtos.UserRegistrationDto;
+import com.zoro.userservice.dtos.SignUpRequestDto;
+import com.zoro.userservice.dtos.UserDto;
 import com.zoro.userservice.exceptions.NotFoundException;
 import com.zoro.userservice.models.User;
-import com.zoro.userservice.services.UserService;
+import com.zoro.userservice.services.AuthService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,26 +14,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/")
-public class UserController {
-    private UserService userService;
-    public UserController(UserService userService){
-        this.userService = userService;
+@RequestMapping("/auth")
+public class AuthController {
+    private AuthService authService;
+    public AuthController(AuthService userService){
+        this.authService = userService;
     }
 
-    @PostMapping("/users")
-    public User createUser(@RequestBody UserRegistrationDto userRegistrationDto){
-        return userService.createUser(userRegistrationDto);
+    @PostMapping("/signup")
+    public UserDto singup(@RequestBody SignUpRequestDto signUpRequestDto){
+        return authService.signup(signUpRequestDto);
     }
 
     @PostMapping("/login")
     public TokenDto login(@RequestBody LoginDto loginDto) throws NotFoundException {
-        return userService.login(loginDto);
+        return authService.login(loginDto);
     }
 
     @PostMapping("/logout")
     public String logout(@RequestBody TokenDto tokenDto) {
-        return userService.logout(tokenDto);
+        return authService.logout(tokenDto);
     }
 
 }
