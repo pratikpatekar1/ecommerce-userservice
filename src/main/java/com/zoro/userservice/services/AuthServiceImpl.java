@@ -1,10 +1,10 @@
 package com.zoro.userservice.services;
 
 import com.zoro.userservice.dtos.LoginRequestDto;
-import com.zoro.userservice.dtos.TokenDto;
 import com.zoro.userservice.dtos.SignUpRequestDto;
 import com.zoro.userservice.dtos.UserDto;
 import com.zoro.userservice.exceptions.NotFoundException;
+import com.zoro.userservice.models.Role;
 import com.zoro.userservice.models.Session;
 import com.zoro.userservice.models.User;
 import com.zoro.userservice.repositories.SessionRepository;
@@ -14,8 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMapAdapter;
 
-import java.util.Random;
+import java.util.*;
 
 @Primary
 @Service
@@ -24,7 +25,7 @@ public class AuthServiceImpl implements AuthService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private UserRepository userRepository;
     private SessionRepository sessionRepository;
-    private String candidateChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*abcdefghijklmnopqrstuvwxyz";
+    private String candidateChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$^&*abcdefghijklmnopqrstuvwxyz";
     public AuthServiceImpl(UserRepository userRepository, SessionRepository sessionRepository, BCryptPasswordEncoder bCryptPasswordEncoder){
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
@@ -39,6 +40,11 @@ public class AuthServiceImpl implements AuthService {
         return sb.toString();
     }
 
+    private String getJwtToken(String email, Set<Role> roles){
+        //TODO: Implement JWT token generation
+        return "Token";
+    }
+
     @Override
     public UserDto signup(SignUpRequestDto signUpRequestDto) {
         User user = new User();
@@ -47,29 +53,45 @@ public class AuthServiceImpl implements AuthService {
         User savedUser = userRepository.save(user);
         UserDto userDto = new UserDto();
         userDto.setEmail(savedUser.getEmail());
+        userDto.setRoles(savedUser.getRoles());
         return userDto;
     }
-    public TokenDto login(LoginRequestDto loginDetails) throws NotFoundException {
-        User user = userRepository.findByEmail(loginDetails.getEmail());
-        if (user == null){
+    public ResponseEntity<UserDto> login(LoginRequestDto loginDetails) throws NotFoundException {
+        Optional<User> savedUser = userRepository.findByEmail(loginDetails.getEmail());
+        if(savedUser.isEmpty()){
             throw new NotFoundException("User not found");
         }
+        User user = savedUser.get();
         if(!bCryptPasswordEncoder.matches(loginDetails.getPassword(),user.getPassword())){
             //TODO: Create a proper exception to throw here
             throw new NotFoundException("Incorrect password");
         }
-        TokenDto tokenDto = new TokenDto();
-        tokenDto.setToken(getRandomToken());
+
+        UserDto userDto = new UserDto();
+        userDto.setEmail(user.getEmail());
+        userDto.setRoles(user.getRoles());
+
+        String randomToken = getRandomToken();
+//        String jwtToken = getJwtToken(user.getEmail(), user.getRoles());
+
         Session session = new Session();
-        session.setToken(tokenDto.getToken());
+        session.setToken(randomToken);
+//        session.setToken(jwtToken);
         session.setUser(user);
         sessionRepository.save(session);
-        return tokenDto;
+
+        MultiValueMapAdapter<String,String> headers = new MultiValueMapAdapter<>(new HashMap<>());
+
+        headers.add("Set-Cookie", "auth-token="+randomToken);
+//        headers.add("Set-Cookie", "auth-token="+jwtToken);
+
+        return new ResponseEntity<>(userDto, headers, HttpStatus.OK);
     }
 
-    public String logout(TokenDto tokenDto){
-        Session session = sessionRepository.findByToken(tokenDto.getToken());
-        if(session==null)return "Invalid token";
+    public String logout(String token){
+        Optional<Session> savedSession = sessionRepository.findByToken(token);
+        if(savedSession.isEmpty())return "Invalid token";
+        Session session = savedSession.get();
         sessionRepository.delete(session);
         return "Logged out successfully";
     }

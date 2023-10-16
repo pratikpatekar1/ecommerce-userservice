@@ -1,17 +1,13 @@
 package com.zoro.userservice.controllers;
 
 import com.zoro.userservice.dtos.LoginRequestDto;
-import com.zoro.userservice.dtos.TokenDto;
 import com.zoro.userservice.dtos.SignUpRequestDto;
 import com.zoro.userservice.dtos.UserDto;
 import com.zoro.userservice.exceptions.NotFoundException;
 import com.zoro.userservice.services.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -28,13 +24,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDto> login(@RequestBody LoginRequestDto loginRequestDto) throws NotFoundException {
-        return new ResponseEntity<>(authService.login(loginRequestDto),HttpStatus.OK);
+    public ResponseEntity<UserDto> login(@RequestBody LoginRequestDto loginRequestDto) throws NotFoundException {
+        return authService.login(loginRequestDto);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody TokenDto tokenDto) {
-        return new ResponseEntity<>(authService.logout(tokenDto),HttpStatus.OK);
+    public ResponseEntity<String> logout(@CookieValue(name="auth-token")  String token) {
+        return new ResponseEntity<>(authService.logout(token),HttpStatus.OK);
     }
 
 }
