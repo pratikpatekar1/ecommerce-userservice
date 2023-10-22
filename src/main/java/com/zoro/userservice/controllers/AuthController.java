@@ -3,6 +3,7 @@ package com.zoro.userservice.controllers;
 import com.zoro.userservice.dtos.LoginRequestDto;
 import com.zoro.userservice.dtos.SignUpRequestDto;
 import com.zoro.userservice.dtos.UserDto;
+import com.zoro.userservice.exceptions.BadCredentialsException;
 import com.zoro.userservice.exceptions.NotFoundException;
 import com.zoro.userservice.services.AuthService;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody LoginRequestDto loginRequestDto) throws NotFoundException {
+    public ResponseEntity<UserDto> login(@RequestBody LoginRequestDto loginRequestDto) throws NotFoundException, BadCredentialsException {
         return authService.login(loginRequestDto);
     }
 

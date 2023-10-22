@@ -11,4 +11,9 @@ public class ControllerAdvices {
     private ResponseEntity<String> handleNotFoundException(NotFoundException notFoundException){
         return new ResponseEntity<>(notFoundException.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    private ResponseEntity<String> handleBadCredentialsException(BadCredentialsException badCredentialsException){
+        return new ResponseEntity<>(badCredentialsException.getMessage(), HttpStatus.OK);
+    }
 }

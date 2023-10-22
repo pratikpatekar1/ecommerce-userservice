@@ -17,7 +17,7 @@ public class UserController {
         this.userService = userService;
     }
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserDetails(@PathVariable UUID id) throws NotFoundException {
+    public ResponseEntity<UserDto> getUserDetails(@PathVariable String id) throws NotFoundException {
         UserDto userDto = userService.getUserDetails(id);
         if(userDto == null){
             throw new NotFoundException("User not found");

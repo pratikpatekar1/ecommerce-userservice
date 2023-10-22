@@ -5,6 +5,7 @@ import com.zoro.userservice.models.User;
 import com.zoro.userservice.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -14,11 +15,12 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public UserDto getUserDetails(UUID id) {
-        User user = userRepository.findById(id).orElse(null);
-        if(user == null){
+    public UserDto getUserDetails(String id) {
+        Optional<User> savedUser = userRepository.findById(UUID.fromString(id));
+        if(savedUser.isEmpty()){
             return null;
         }
+        User user = savedUser.get();
         UserDto userDto = new UserDto();
         userDto.setEmail(user.getEmail());
         userDto.setRoles(user.getRoles());
