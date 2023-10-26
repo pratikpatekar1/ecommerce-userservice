@@ -8,9 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -22,5 +21,5 @@ public class User extends BaseModel{
     @Fetch(FetchMode.SUBSELECT)
     private List<Session> sessions;
     @ManyToMany
-    private Set<Role> roles = new HashSet<>();
+    private List<Role> roles = new ArrayList<>();
 }

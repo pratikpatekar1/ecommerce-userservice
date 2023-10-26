@@ -1,0 +1,2 @@
+ALTER TABLE session
+    ADD status SMALLINT NULL;

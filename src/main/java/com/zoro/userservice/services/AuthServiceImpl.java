@@ -6,10 +6,11 @@ import com.zoro.userservice.dtos.UserDto;
 import com.zoro.userservice.exceptions.BadCredentialsException;
 import com.zoro.userservice.exceptions.NotFoundException;
 import com.zoro.userservice.models.Session;
+import com.zoro.userservice.models.SessionStatus;
 import com.zoro.userservice.models.User;
 import com.zoro.userservice.repositories.SessionRepository;
 import com.zoro.userservice.repositories.UserRepository;
-import com.zoro.userservice.utils.JwtUtil;
+import com.zoro.userservice.security.JwtUtil;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,11 +60,12 @@ public class AuthServiceImpl implements AuthService {
         userDto.setEmail(user.getEmail());
         userDto.setRoles(user.getRoles());
 
-        String jwtToken = jwtUtil.generateToken(userDto);
+        String jwtToken = jwtUtil.generateToken(user);
 
         Session session = new Session();
         session.setToken(jwtToken);
         session.setUser(user);
+        session.setStatus(SessionStatus.ACTIVE);
         sessionRepository.save(session);
 
         MultiValueMapAdapter<String,String> headers = new MultiValueMapAdapter<>(new HashMap<>());
@@ -77,7 +79,12 @@ public class AuthServiceImpl implements AuthService {
         Optional<Session> savedSession = sessionRepository.findByToken(token);
         if(savedSession.isEmpty())return "Invalid token";
         Session session = savedSession.get();
-        sessionRepository.delete(session);
+        session.setStatus(SessionStatus.INACTIVE);
+        sessionRepository.save(session);
         return "Logged out successfully";
+    }
+
+    public Boolean validateToken(String token){
+        return jwtUtil.validateToken(token);
     }
 }

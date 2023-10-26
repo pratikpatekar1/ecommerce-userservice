@@ -15,4 +15,6 @@ public class Session extends BaseModel{
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
+    private SessionStatus status;
+
 }

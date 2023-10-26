@@ -12,4 +12,5 @@ public interface AuthService {
     UserDto signup(SignUpRequestDto signUpRequestDto);
     ResponseEntity<UserDto> login(LoginRequestDto loginDto) throws NotFoundException, BadCredentialsException;
     String logout(String token);
+    Boolean validateToken(String token);
 }
