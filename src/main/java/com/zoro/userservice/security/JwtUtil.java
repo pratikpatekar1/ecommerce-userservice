@@ -49,6 +49,7 @@ public class JwtUtil {
     }
 
     private Boolean isTokenExpired(Date createdAt){
+        // checking created at is not before 1 day from now
         if(createdAt.before(Date.from(Instant.now().minus(Duration.ofDays(1)))))return true;
         return false;
     }

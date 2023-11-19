@@ -1,2 +1,2 @@
 ALTER TABLE session
-    ADD status SMALLINT NULL;
+    ADD status TINYINT NULL;
