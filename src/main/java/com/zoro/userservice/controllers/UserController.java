@@ -24,4 +24,9 @@ public class UserController {
         }
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
+
+    @PostMapping("/add/role")
+    public ResponseEntity<String>addRoleToUser(@RequestParam("userId") String userId, @RequestParam("roleId") String roleId) throws NotFoundException {
+        return new ResponseEntity<>(userService.addRoleToUser(userId, roleId),HttpStatus.OK);
+    }
 }
